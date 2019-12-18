@@ -1,6 +1,6 @@
 # Three.js로 3D 그래픽 만들기 책 스터디
 
-- [x] 1장, ‘Three.js로 첫 번째 3D 장면 제작’에서는 Three.js 시작에 필요한 기본 단계를 설명한다. 1장을 마치면 첫 번째 Three.js 장면을 만들고 브라우저에서 첫 3D 장면을 실행시킬 수 있게 될 것이다.
+- [x] 1장, ‘Three.js로 첫 번째 3D 장면 제작’에서는 Three.js 시작에 필요한 기본 단계를 설명한다. 1장을 마치면 첫 번째 Three.js 장면을 만들고 브라우저에서 첫 3D 장면을 실행시킬 수 있게 될 것이다. [https://9min.github.io/threejs-study/chapter-01](https://9min.github.io/threejs-study/chapter-01)
 
 - [ ] 2장, ‘Three.js 장면의 기본 구성요소’에서는 Three.js로 작업하는 데 필요한 기본 구성요소에 대해 설명한다. 조명과 메시, 지오메트리, 물질 및 카메라에 대해 알아본다. 또한 2장을 통해 Three.js가 제공하는 다양한 조명과 장면에서 사용할 수 있는 카메라에 대한 개요를 배운다.
 
