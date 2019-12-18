@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>chapter-01</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../libs/stats.js"></script>
+    <script type="text/javascript" src="../libs/dat.gui.js"></script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="canvasStatus"></div>
+    <div id="canvasWrap"></div>
+
+    <script>
+      class WebGLAnimation {
+        constructor() {
+          this.el = {};
+          this.color = {
+            clear: "#999999",
+            ambientLight: "#111111",
+            spotLight: "#ffffff",
+            plane: "#005500",
+            cube: "#ff00ff",
+            sphere: "#ffff00"
+          };
+          this.stats = null;
+          this.scene = null;
+          this.camera = null;
+          this.renderer = null;
+          this.controls = null;
+          this.cube = null;
+          this.sphere = null;
+          this.step = 0;
+        }
+
+        init = () => {
+          this.initElements();
+          this.initStats();
+          this.initScene();
+          this.initCamera();
+          this.initLight();
+          this.initRenderer();
+          this.initControls();
+          this.initGUI();
+          this.initEvents();
+          this.createPlane();
+          this.createCube();
+          this.createSphere();
+
+          this.render();
+        };
+
+        initElements = () => {
+          this.el["canvasStatus"] = this.qs("#canvasStatus");
+          this.el["canvasWrap"] = this.qs("#canvasWrap");
+        };
+
+        initStats = () => {
+          this.stats = new Stats();
+          this.stats.setMode(0);
+
+          Object.assign(this.stats.domElement.style, {
+            position: "absolute",
+            left: "0px",
+            top: "0px"
+          });
+
+          this.el["canvasStatus"].appendChild(this.stats.domElement);
+        };
+
+        initScene = () => {
+          this.scene = new THREE.Scene();
+        };
+
+        initCamera = () => {
+          this.camera = new THREE.PerspectiveCamera(
+            45,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+          );
+          this.camera.position.x = -30;
+          this.camera.position.y = 40;
+          this.camera.position.z = 40;
+          this.camera.lookAt(this.scene.position);
+        };
+
+        initLight = () => {
+          const ambientLight = new THREE.AmbientLight(this.color.ambientLight);
+          const spotLight = new THREE.SpotLight(this.color.spotLight);
+
+          spotLight.position.set(-40, 60, -10);
+          spotLight.castShadow = true;
+
+          this.scene.add(ambientLight);
+          this.scene.add(spotLight);
+        };
+
+        initRenderer = () => {
+          this.renderer = new THREE.WebGLRenderer();
+
+          this.renderer.setClearColor(new THREE.Color(this.color.clear));
+          this.renderer.setSize(window.innerWidth, window.innerHeight);
+          this.renderer.shadowMapEnabled = true;
+
+          this.el["canvasWrap"].appendChild(this.renderer.domElement);
+        };
+
+        initControls = () => {
+          this.controls = {
+            rotationSpeed: 0.02,
+            bouncingSpeed: 0.03
+          };
+        };
+
+        initGUI = () => {
+          const gui = new dat.GUI();
+
+          gui.add(this.controls, "rotationSpeed", 0, 0.5);
+          gui.add(this.controls, "bouncingSpeed", 0, 0.5);
+        };
+
+        initEvents = () => {
+          window.addEventListener("resize", this.onResize);
+        };
+
+        createPlane = () => {
+          // MeshLambertMaterial 대신 MeshBasicMaterial 로 만들면 빛을 비추지 않아도 색상이 보인다
+          const planeGeometry = new THREE.PlaneGeometry(60, 20, 1, 1);
+          const planeMaterial = new THREE.MeshLambertMaterial({
+            color: this.color.plane
+          });
+          const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+          plane.rotation.x = -0.5 * Math.PI;
+          plane.position.x = 5;
+          plane.position.y = 0;
+          plane.position.z = 0;
+          plane.receiveShadow = true;
+
+          this.scene.add(plane);
+        };
+
+        createCube = () => {
+          const cubeGeometry = new THREE.BoxGeometry(4, 4, 4);
+          const cubeMaterial = new THREE.MeshLambertMaterial({
+            color: this.color.cube
+          });
+
+          this.cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+
+          this.cube.position.x = -15;
+          this.cube.position.y = 3;
+          this.cube.position.z = 0;
+          this.cube.castShadow = true;
+
+          this.scene.add(this.cube);
+        };
+
+        createSphere = () => {
+          const sphereGeometry = new THREE.SphereGeometry(4, 20, 20);
+          const sphereMaterial = new THREE.MeshLambertMaterial({
+            color: this.color.sphere
+          });
+
+          this.sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+          this.sphere.position.x = 10;
+          this.sphere.position.y = 0;
+          this.sphere.position.z = 2;
+          this.sphere.castShadow = true;
+
+          this.scene.add(this.sphere);
+        };
+
+        render = () => {
+          const { rotationSpeed, bouncingSpeed } = this.controls;
+
+          this.stats.update();
+
+          this.cube.rotation.x += rotationSpeed;
+          this.cube.rotation.y += rotationSpeed;
+          this.cube.rotation.z += rotationSpeed;
+
+          this.step += bouncingSpeed;
+
+          this.sphere.position.x = 10 + 10 * Math.cos(this.step);
+          this.sphere.position.y = 2 + 10 * Math.abs(Math.sin(this.step));
+
+          this.renderer.render(this.scene, this.camera);
+
+          window.requestAnimationFrame(this.render);
+        };
+
+        onResize = () => {
+          const { innerWidth, innerHeight } = window;
+
+          this.camera.aspect = innerWidth / innerHeight;
+          this.camera.updateProjectionMatrix();
+          this.renderer.setSize(innerWidth, innerHeight);
+        };
+
+        qs = s => document.querySelector(s);
+      }
+
+      new WebGLAnimation().init();
+    </script>
+  </body>
+</html>
